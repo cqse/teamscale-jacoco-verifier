@@ -9,13 +9,13 @@ enum class VerificationResult(val userReadableDescription: String) {
     NO_COVERAGE_AT_ALL(
         """
             None of the classes in your coverage report have any coverage.
-            You probably set "includes"/"excludes" patterns that are too restrictive.
+            You probably set "includes/excludes" patterns that are too restrictive.
         """.trimIndent()
     ),
     NO_COVERAGE_IN_PACKAGE(
         """
             The report contains coverage, but not in your package.
-            You probably set "includes"/"excludes" patterns that are too restrictive.
+            You probably set "includes/excludes" patterns that are too restrictive.
         """.trimIndent()
     ),
     PACKAGE_NOT_IN_REPORT(
