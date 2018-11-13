@@ -3,38 +3,34 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 import utils.addOnChangeListener
+import java.awt.Color
 import java.awt.Dimension
 import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.JFrame
+import javax.swing.filechooser.FileNameExtensionFilter
 
-private enum class EPackageNameValidity {
-    NOT_SET, VALID, INVALID
-}
+
 
 private data class ViewModel(
     val verificationResult: VerificationResult?,
     val selectedFile: String?,
-    val packageName: String?
+    val packageName: String
 ) {
 
-    val packageNameValidity
-        get() = when {
-            packageName == null -> EPackageNameValidity.NOT_SET
-            CoverageFileVerifier.isValidPackageName(packageName) -> EPackageNameValidity.VALID
-            else -> EPackageNameValidity.INVALID
-        }
+    val packageNameIsValid
+        get() = CoverageFileVerifier.isValidPackageName(packageName)
 
 }
 
-class MainController(private val main: Main) : CoroutineScope {
+class MainController(private val main: MainForm) : CoroutineScope {
 
     override val coroutineContext = Dispatchers.Swing
 
     private var viewModel = ViewModel(
         verificationResult = null,
         selectedFile = null,
-        packageName = null
+        packageName = "com.yourpackage"
     )
         set(value) {
             if (value == field) {
@@ -70,34 +66,52 @@ class MainController(private val main: Main) : CoroutineScope {
 
         main.selectButton.addActionListener {
             val chooser = JFileChooser()
+            chooser.fileFilter = FileNameExtensionFilter("JaCoCo XML reports", "xml")
             if (chooser.showOpenDialog(main.root) == JFileChooser.APPROVE_OPTION) {
                 viewModel = viewModel.copy(selectedFile = chooser.selectedFile.absolutePath)
             }
         }
+
+        update()
     }
 
     private fun update() {
         launch(Dispatchers.Swing) {
-            main.resultLabel.text = when (viewModel.verificationResult) {
-                null -> ""
-                VerificationResult.SUCCESS -> "success"
-                else -> "failed"
+            val userReadableDescription = viewModel.verificationResult?.userReadableDescription ?: ""
+            val htmlDescription = userReadableDescription.replace("\n".toRegex(), "<br/>")
+            main.resultLabel.text = "<html>$htmlDescription</html>"
+
+            main.resultLabel.foreground = when (viewModel.verificationResult) {
+                VerificationResult.SUCCESS -> Color.GREEN
+                else -> Color.RED
             }
 
-            main.coverageFileLabel.text = when (viewModel.selectedFile) {
-                null -> "(please select)"
-                else -> viewModel.selectedFile
-            }
+            main.coverageFileLabel.text = viewModel.selectedFile ?: "(please select a file)"
 
-            main.verifyCoverageFileButton.isEnabled = when (viewModel.packageNameValidity) {
-                EPackageNameValidity.VALID -> true
-                else -> false
-            }
+            main.verifyCoverageFileButton.isEnabled = viewModel.packageNameIsValid && viewModel.selectedFile != null
 
-            if (viewModel.packageNameValidity == EPackageNameValidity.INVALID) {
+            if (!viewModel.packageNameIsValid) {
                 main.resultLabel.text = "Invalid package name: ${viewModel.packageName}"
             }
         }
     }
 
+
+    companion object {
+
+        @JvmStatic
+        fun main(args: Array<String>) {
+            if (args.size == 2) {
+                val coverageFile = args[0]
+                val packageName = args[1]
+                println("Verifying coverage report $coverageFile and looking for package $packageName...")
+                val result = CoverageFileVerifier.verify(File(coverageFile).readText(), packageName)
+                println(result.userReadableDescription)
+                return
+            }
+
+            println("Starting GUI...")
+            MainController(MainForm()).run()
+        }
+    }
 }

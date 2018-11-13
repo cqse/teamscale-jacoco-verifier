@@ -39,4 +39,4 @@ dependencies {
     runtime "org.junit.platform:junit-platform-console:$junitPlatformVersion"
 }
 
-mainClassName = 'Main'
+mainClassName = 'MainController'

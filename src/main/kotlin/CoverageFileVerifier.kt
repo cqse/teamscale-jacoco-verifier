@@ -1,12 +1,29 @@
-
 import org.xml.sax.Attributes
 import org.xml.sax.InputSource
 import org.xml.sax.helpers.DefaultHandler
 import javax.xml.parsers.SAXParserFactory
 
-enum class VerificationResult {
+enum class VerificationResult(val userReadableDescription: String) {
 
-    SUCCESS, NO_COVERAGE_AT_ALL, NO_COVERAGE_IN_PACKAGE, PACKAGE_NOT_IN_REPORT, NOT_A_JACOCO_REPORT
+    SUCCESS("The report looks valid"),
+    NO_COVERAGE_AT_ALL(
+        """
+            None of the classes in your coverage report have any coverage.
+            You probably set "includes"/"excludes" patterns that are too restrictive.
+        """.trimIndent()
+    ),
+    NO_COVERAGE_IN_PACKAGE(
+        """
+            The report contains coverage, but not in your package.
+            You probably set "includes"/"excludes" patterns that are too restrictive.
+        """.trimIndent()
+    ),
+    PACKAGE_NOT_IN_REPORT(
+        """
+            Your package is not contained in the report.
+            You probably provided an incorrect "class dir".
+        """.trimIndent()),
+    NOT_A_JACOCO_REPORT("This file does not look like a JaCoCo report at all")
 
 }
 
