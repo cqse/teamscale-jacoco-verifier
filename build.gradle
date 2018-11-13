@@ -81,5 +81,7 @@ distributions {
 		}
 	}
 }
+distZip.version = ''
+distTar.version = ''
 
 mainClassName = 'MainController'
