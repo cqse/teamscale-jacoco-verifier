@@ -10,8 +10,6 @@ import javax.swing.JFileChooser
 import javax.swing.JFrame
 import javax.swing.filechooser.FileNameExtensionFilter
 
-
-
 private data class ViewModel(
     val verificationResult: VerificationResult?,
     val selectedFile: String?,
@@ -53,9 +51,8 @@ class MainController(private val main: MainForm) : CoroutineScope {
 
         main.verifyCoverageFileButton.addActionListener {
             launch(Dispatchers.Default) {
-                val packageName = viewModel.packageName ?: return@launch
                 val xmlContent = File(viewModel.selectedFile).readText()
-                val result = CoverageFileVerifier.verify(xmlContent, packageName)
+                val result = CoverageFileVerifier.verify(xmlContent, viewModel.packageName)
                 viewModel = viewModel.copy(verificationResult = result)
             }
         }
