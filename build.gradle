@@ -6,8 +6,10 @@ buildscript {
 
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.3.0'
+	id 'de.fntsoftware.gradle.markdown-to-pdf' version '1.0.1'
 }
 
+apply plugin: 'kotlin'
 apply plugin: 'application'
 
 group 'com.teamscale'
@@ -22,8 +24,39 @@ ext {
     junitPlatformVersion = "1.0.0"
 }
 
+configurations {
+    javac2
+}
+
+dependencies {
+    compile 'com.intellij:forms_rt:7.0.3'
+    javac2 group:'com.intellij', name:'javac2', version: '7.0.3'
+}
+
+// use IntelliJ's javac2 to compile the .form classes
+compileJava {
+    doLast {
+        new File(projectDir,'build/classes/main').mkdirs()
+        ant.taskdef(name: 'javac2',
+                classname: 'com.intellij.ant.Javac2',
+                classpath: configurations.javac2.asPath)
+        ant.javac2(srcdir: 'src/main/java',
+                classpath: configurations.compile.asPath,
+                destdir: 'build/classes/main',
+                debug: "on",
+                debugLevel: "lines",
+                deprecation: "off",
+                includeAntRuntime: false,
+                optimize: "off",
+                source: sourceCompatibility,
+                target: targetCompatibility
+        )
+    }
+}
+
 dependencies {
     implementation group: 'com.jgoodies', name: 'jgoodies-forms', version: '1.9.0'
+    implementation 'com.intellij:forms_rt:7.0.3'
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.1"
@@ -37,6 +70,16 @@ dependencies {
 
     runtime "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
     runtime "org.junit.platform:junit-platform-console:$junitPlatformVersion"
+}
+
+distributions {
+	main {
+		contents {
+			from(documentationToPdf) {
+				into 'documentation'
+			}
+		}
+	}
 }
 
 mainClassName = 'MainController'

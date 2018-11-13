@@ -8,7 +8,7 @@ Little tool to verify the contents JaCoCo XML reports for common error condition
 
 ## Documentation
 
-* [Documentation](documentation/README.md)
+* [Documentation](documentation.md)
 
 ## Development
 
