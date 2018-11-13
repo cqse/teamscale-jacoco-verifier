@@ -65,7 +65,7 @@
           <forms defaultalign-horz="false"/>
         </constraints>
         <properties>
-          <text value="e.g: com.yourcompany"/>
+          <text value="com.yourcompany"/>
           <toolTipText value="e.g: com.yourcompany"/>
         </properties>
       </component>
