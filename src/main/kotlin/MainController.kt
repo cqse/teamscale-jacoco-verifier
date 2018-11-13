@@ -4,6 +4,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 import utils.addOnChangeListener
 import java.awt.Dimension
+import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.JFrame
 
@@ -56,7 +57,10 @@ class MainController(private val main: Main) : CoroutineScope {
 
         main.verifyCoverageFileButton.addActionListener {
             launch(Dispatchers.Default) {
-                viewModel = viewModel.copy(verificationResult = CoverageFileVerifier.verify())
+                val packageName = viewModel.packageName ?: return@launch
+                val xmlContent = File(viewModel.selectedFile).readText()
+                val result = CoverageFileVerifier.verify(xmlContent, packageName)
+                viewModel = viewModel.copy(verificationResult = result)
             }
         }
 
