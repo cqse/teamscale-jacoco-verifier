@@ -1,6 +1,8 @@
+
 import org.xml.sax.Attributes
 import org.xml.sax.InputSource
 import org.xml.sax.helpers.DefaultHandler
+import java.io.ByteArrayInputStream
 import javax.xml.parsers.SAXParserFactory
 
 enum class VerificationResult(val userReadableDescription: String) {
@@ -43,7 +45,7 @@ object CoverageFileVerifier {
         private var isInPackage = false
 
         override fun resolveEntity(publicId: String?, systemId: String?): InputSource {
-            return InputSource()
+            return InputSource(ByteArrayInputStream(byteArrayOf()))
         }
 
         override fun startElement(uri: String?, localName: String?, qName: String, attributes: Attributes) {

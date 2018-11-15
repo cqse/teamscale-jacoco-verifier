@@ -12,6 +12,14 @@ class CoverageFileVerifierTest {
     }
 
     @Test
+    fun `valid file with doctype`() {
+        val result = CoverageFileVerifier.verify("""
+            <?xml version="1.0" encoding="UTF-8" standalone="yes"?><!DOCTYPE report PUBLIC "-//JACOCO//DTD Report 1.0//EN" "report.dtd"><report name="test"><group name="coverageTest"><package name="com/mypackage"><class name="com/acme/Customer"><method name="&lt;init&gt;" desc="()V" line="3"><counter type="INSTRUCTION" missed="3" covered="3"/></method></class></package></group></report>
+        """.trimIndent(), "com.mypackage")
+        assertk.assert(result).isEqualTo(VerificationResult.SUCCESS)
+    }
+
+    @Test
     fun `package not in report`() {
         val result = CoverageFileVerifier.verify("""
             <?xml version="1.0" encoding="UTF-8" standalone="yes"?><report name="test"><group name="coverageTest"></group><counter type="INSTRUCTION" missed="3" covered="0"/></report>
