@@ -109,7 +109,7 @@ class MainController(private val main: MainForm) : CoroutineScope {
             }
             if (args.size == 1) {
                 val coverageFile = args[0]
-                CoverageFileStatistics.print(File(coverageFile).inputStream())
+                CoverageFileStatistics.print(File(coverageFile).inputStream(), System.out)
                 return
             }
 
