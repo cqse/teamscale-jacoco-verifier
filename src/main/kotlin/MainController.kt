@@ -2,6 +2,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
+import utils.CoverageFileStatistics
 import utils.addOnChangeListener
 import java.awt.Color
 import java.awt.Dimension
@@ -51,8 +52,8 @@ class MainController(private val main: MainForm) : CoroutineScope {
 
         main.verifyCoverageFileButton.addActionListener {
             launch(Dispatchers.Default) {
-                val xmlContent = File(viewModel.selectedFile).readText()
-                val result = CoverageFileVerifier.verify(xmlContent, viewModel.packageName)
+                val xmlStream = File(viewModel.selectedFile).inputStream()
+                val result = CoverageFileVerifier.verify(xmlStream, viewModel.packageName)
                 viewModel = viewModel.copy(verificationResult = result)
             }
         }
@@ -102,8 +103,13 @@ class MainController(private val main: MainForm) : CoroutineScope {
                 val coverageFile = args[0]
                 val packageName = args[1]
                 println("Verifying coverage report $coverageFile and looking for package $packageName...")
-                val result = CoverageFileVerifier.verify(File(coverageFile).readText(), packageName)
+                val result = CoverageFileVerifier.verify(File(coverageFile).inputStream(), packageName)
                 println(result.userReadableDescription)
+                return
+            }
+            if (args.size == 1) {
+                val coverageFile = args[0]
+                CoverageFileStatistics.print(File(coverageFile).inputStream(), System.out)
                 return
             }
 

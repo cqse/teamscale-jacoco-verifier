@@ -3,6 +3,7 @@ import org.xml.sax.Attributes
 import org.xml.sax.InputSource
 import org.xml.sax.helpers.DefaultHandler
 import java.io.ByteArrayInputStream
+import java.io.InputStream
 import javax.xml.parsers.SAXParserFactory
 
 enum class VerificationResult(val userReadableDescription: String) {
@@ -77,12 +78,12 @@ object CoverageFileVerifier {
 
     }
 
-    fun verify(xmlContent: String, packageName: String): VerificationResult {
+    fun verify(xmlStream: InputStream, packageName: String): VerificationResult {
         val parser = SAXParserFactory.newInstance().newSAXParser()
         val handler = Handler(packageName)
 
         try {
-            parser.parse(xmlContent.byteInputStream(), handler)
+            parser.parse(xmlStream, handler)
         } catch (e: Exception) {
             return VerificationResult.NOT_A_JACOCO_REPORT
         }
